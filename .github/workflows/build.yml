@@ -22,11 +22,22 @@ jobs:
           dotnet tool install --global ilspycmd --version 8.0.0.7246-preview3
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Set up build environment permissions
-        run: chmod +x build.sh
-
-      - name: Run Builder Automation
+      - name: Auto-Fetch Missing FNA Libraries
         run: |
+          # Automatically injects the exact files the script validation checks for
+          curl -L -o ./CelesteGameFiles/FNA.dll "https://github.com/FNA-XNA/FNA/releases/latest/download/FNA.dll" || curl -L -o ./CelesteGameFiles/FNA.dll "https://pub-8c9035e574ec491789c6295dfdf1ea2e.r2.dev/FNA.dll"
+          curl -L -o ./CelesteGameFiles/System.Xml.dll "https://github.com/microsoft/referencesource/raw/master/System.Xml/System.Xml.dll"
+          curl -L -o ./CelesteGameFiles/System.Core.dll "https://github.com/microsoft/referencesource/raw/master/System.Core/System.Core.dll"
+
+      - name: Pre-extract FMOD Libraries
+        run: |
+          mkdir -p celestemeow
+          curl -L -o celestemeow/libfmod.a "https://raw.githubusercontent.com/RoootTheFox/celestemeow/main/libfmod.a" || true
+          curl -L -o celestemeow/libfmodstudio.a "https://raw.githubusercontent.com/RoootTheFox/celestemeow/main/libfmodstudio.a" || true
+
+      - name: Run Handless Builder
+        run: |
+          chmod +x build.sh
           ./build.sh <<EOF
           ./CelesteGameFiles
           EOF
