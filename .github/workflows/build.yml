@@ -9,8 +9,6 @@ jobs:
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -22,10 +20,9 @@ jobs:
           dotnet tool install --global ilspycmd --version 8.0.0.7246-preview3
           echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
 
-      - name: Auto-Fetch Missing FNA Libraries
+      - name: Check and Fetch Missing System Libraries
         run: |
-          # Automatically injects the exact files the script validation checks for
-          curl -L -o ./CelesteGameFiles/FNA.dll "https://github.com/FNA-XNA/FNA/releases/latest/download/FNA.dll" || curl -L -o ./CelesteGameFiles/FNA.dll "https://pub-8c9035e574ec491789c6295dfdf1ea2e.r2.dev/FNA.dll"
+          # Pulls just the basic Microsoft system dependencies directly
           curl -L -o ./CelesteGameFiles/System.Xml.dll "https://github.com/microsoft/referencesource/raw/master/System.Xml/System.Xml.dll"
           curl -L -o ./CelesteGameFiles/System.Core.dll "https://github.com/microsoft/referencesource/raw/master/System.Core/System.Core.dll"
 
