@@ -1,0 +1,38 @@
+name: Build Celeste iOS
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Install ilspycmd
+        run: |
+          dotnet tool install --global ilspycmd --version 8.0.0.7246-preview3
+          echo "$HOME/.dotnet/tools" >> $GITHUB_PATH
+
+      - name: Set up build environment permissions
+        run: chmod +x build.sh
+
+      - name: Run Builder Automation
+        run: |
+          ./build.sh <<EOF
+          ./CelesteGameFiles
+          EOF
+
+      - name: Upload Finished IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: Celeste-iOS-Beta
+          path: ./*.ipa
